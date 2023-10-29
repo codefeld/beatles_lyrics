@@ -29,3 +29,13 @@ def count_words(lyrics):
     words = lyrics.split()
     return len(words)
 
+def count_unique_words(lyrics):
+    unique_words = []
+    cleaned_lyrics = cleanse_lyrics(lyrics)
+    words = cleaned_lyrics.split()
+    for word in words:
+        word = word.strip('().,?!').lower()
+        if word not in unique_words:
+            unique_words.append(word)
+    return unique_words
+

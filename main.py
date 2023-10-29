@@ -1,5 +1,5 @@
 import utils
-from utils import clear
+from utils import clear, count_unique_words
 import csv
 
 def avg_wc():
@@ -29,7 +29,6 @@ def avg_wc():
 	print("The average word count of a Beatles song (given it has lyrics) is " + str(avg_given_lyrics) + " words.")
 	print("The Beatles song with the most lyrics is \"" + most_words + "\", which has " + str(most_words_value) + " words.")
 	print("The Beatles song with the least lyrics is \"" + least_words + "\", which has " + str(least_words_value) + " words.")
-	print(all_words)
 
 def unique_words():
 	all_lyrics = utils.get_all_lyrics()
@@ -70,38 +69,51 @@ def unique_songwriter():
 				title = row[0]
 				song_lyrics = all_lyrics[title]
 				if "lyrics" in song_lyrics:
+					unique_words = count_unique_words(song_lyrics["lyrics"])
 					if "Lennon" in row[9]:
-						cleaned_lyrics = utils.cleanse_lyrics(song_lyrics["lyrics"])
-						words = cleaned_lyrics.split()
-						for word in words:
-							word = word.strip('().,?!').lower()
+						for word in unique_words:
 							if word not in lennon_unique_lyrics:
 								lennon_unique_lyrics.append(word)
 					elif "McCartney" in row[9]:
-						cleaned_lyrics = utils.cleanse_lyrics(song_lyrics["lyrics"])
-						words = cleaned_lyrics.split()
-						for word in words:
-							word = word.strip('().,?!').lower()
+						for word in unique_words:
 							if word not in mccartney_unique_lyrics:
 								mccartney_unique_lyrics.append(word)
 					elif "Harrison" in row[9]:
-						cleaned_lyrics = utils.cleanse_lyrics(song_lyrics["lyrics"])
-						words = cleaned_lyrics.split()
-						for word in words:
-							word = word.strip('().,?!').lower()
+						for word in unique_words:
 							if word not in harrison_unique_lyrics:
 								harrison_unique_lyrics.append(word)
 					elif "Starkey" in row[9]:
-						cleaned_lyrics = utils.cleanse_lyrics(song_lyrics["lyrics"])
-						words = cleaned_lyrics.split()
-						for word in words:
-							word = word.strip('().,?!').lower()
+						for word in unique_words:
 							if word not in starr_unique_lyrics:
 								starr_unique_lyrics.append(word)
 	print("John Lennon used a total of " + str(len(lennon_unique_lyrics)) + " unique words in Beatles songs.")
 	print("Paul McCartney used a total of " + str(len(mccartney_unique_lyrics)) + " unique words in Beatles songs.")
 	print("George Harrison used a total of " + str(len(harrison_unique_lyrics)) + " unique words in Beatles songs.")
 	print("Ringo Starr used a total of " + str(len(starr_unique_lyrics)) + " unique words in Beatles songs.")
+
+def unique_by_year():
+	all_lyrics = utils.get_all_lyrics()
+	years_and_words = {}
+	with open('beatles2.csv', 'r') as csvfile:
+		csvreader = csv.reader(csvfile)
+		next(csvreader)
+		for row in csvreader:
+			if "Lennon" in row[9] or "McCartney" in row[9] or "Harrison" in row[9] or "Starkey" in row[9]:
+				title = row[0]
+				year = row[1]
+				song_lyrics = all_lyrics[title]
+				if "lyrics" in song_lyrics:
+					unique_words = count_unique_words(song_lyrics["lyrics"])
+					if year not in years_and_words:
+						years_and_words[year] = []
+					all_unique_words = years_and_words[year]
+					for word in unique_words:
+						if word not in all_unique_words:
+							all_unique_words.append(word)
+					years_and_words[year] = all_unique_words
+	sorted_years = sorted(years_and_words.keys())
+	for year in sorted_years:
+		print(f"In {year}, the Beatles used {len(years_and_words[year])} different words.")
 				
 
 if __name__ == '__main__':
@@ -109,5 +121,8 @@ if __name__ == '__main__':
 	avg_wc()
 	print("\n")
 	unique_words()
+	print("\n")
 	unique_songwriter()
+	print("\n")
+	unique_by_year()
 		
