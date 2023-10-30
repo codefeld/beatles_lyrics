@@ -1,6 +1,8 @@
 import utils
 from utils import clear, count_unique_words
 import csv
+import matplotlib.pyplot as plt
+import numpy as np
 
 def avg_wc():
 	all_lyrics = utils.get_all_lyrics()
@@ -112,8 +114,15 @@ def unique_by_year():
 							all_unique_words.append(word)
 					years_and_words[year] = all_unique_words
 	sorted_years = sorted(years_and_words.keys())
+	y_list = []
 	for year in sorted_years:
 		print(f"In {year}, the Beatles used {len(years_and_words[year])} different words.")
+		y_list.append(len(years_and_words[year]))
+	xpoints = np.array(sorted_years)
+	ypoints = np.array(y_list)
+	plt.plot(xpoints, ypoints)
+	plt.title("Number of Unique Words in Beatles Lyrics Over Time")
+	plt.show()
 				
 
 if __name__ == '__main__':
