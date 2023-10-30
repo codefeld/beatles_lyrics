@@ -120,8 +120,46 @@ def unique_by_year():
 		y_list.append(len(years_and_words[year]))
 	xpoints = np.array(sorted_years)
 	ypoints = np.array(y_list)
+	# plt.plot(xpoints, ypoints)
+	# plt.title("Number of Unique Words in Beatles Lyrics Over Time")
+	# plt.show()
+
+def avg_unique_by_year():
+	all_lyrics = utils.get_all_lyrics()
+	years_and_words = {}
+	with open('beatles2.csv', 'r') as csvfile:
+		csvreader = csv.reader(csvfile)
+		next(csvreader)
+		for row in csvreader:
+			if "Lennon" in row[9] or "McCartney" in row[9] or "Harrison" in row[9] or "Starkey" in row[9]:
+				title = row[0]
+				year = row[1]
+				song_lyrics = all_lyrics[title]
+				if "lyrics" in song_lyrics:
+					unique_words = count_unique_words(song_lyrics["lyrics"])
+					if year not in years_and_words:
+						years_and_words[year] = {
+							"words": [],
+							"songs": 0,
+							"avg": 0
+						}
+					all_unique_words = years_and_words[year]["words"]
+					for word in unique_words:
+						if word not in all_unique_words:
+							all_unique_words.append(word)
+					years_and_words[year]["words"] = all_unique_words
+					years_and_words[year]["songs"] += 1
+				for year in years_and_words:
+					years_and_words[year]["avg"] = len(years_and_words[year]["words"]) / years_and_words[year]["songs"]
+	sorted_years = sorted(years_and_words.keys())
+	y_list = []
+	for year in sorted_years:
+		print(f"In {year}, the Beatles used an average of {years_and_words[year]['avg']} different words per song (given the song has lyrics).")
+		y_list.append(years_and_words[year]['avg'])
+	xpoints = np.array(sorted_years)
+	ypoints = np.array(y_list)
 	plt.plot(xpoints, ypoints)
-	plt.title("Number of Unique Words in Beatles Lyrics Over Time")
+	plt.title("Average Unique Words in Beatles Lyrics Over Time")
 	plt.show()
 				
 
@@ -134,4 +172,6 @@ if __name__ == '__main__':
 	unique_songwriter()
 	print("\n")
 	unique_by_year()
+	print("\n")
+	avg_unique_by_year()
 		
