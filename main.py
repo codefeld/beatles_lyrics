@@ -154,24 +154,125 @@ def avg_unique_by_year():
 	sorted_years = sorted(years_and_words.keys())
 	y_list = []
 	for year in sorted_years:
-		print(f"In {year}, the Beatles used an average of {years_and_words[year]['avg']} different words per song (given the song has lyrics).")
+		print(f"In {year}, the Beatles used an average of {years_and_words[year]['avg']} different words per song (given the song has lyrics). There were {years_and_words[year]['songs']} songs that year.")
 		y_list.append(years_and_words[year]['avg'])
 	xpoints = np.array(sorted_years)
 	ypoints = np.array(y_list)
 	plt.plot(xpoints, ypoints)
 	plt.title("Average Unique Words in Beatles Lyrics Over Time")
+
+def avg_unique_by_song_by_year():
+	all_lyrics = utils.get_all_lyrics()
+	years_and_words = {}
+	with open('beatles2.csv', 'r') as csvfile:
+		csvreader = csv.reader(csvfile)
+		next(csvreader)
+		for row in csvreader:
+			if "Lennon" in row[9] or "McCartney" in row[9] or "Harrison" in row[9] or "Starkey" in row[9]:
+				title = row[0]
+				year = row[1]
+				song_lyrics = all_lyrics[title]
+				if "lyrics" in song_lyrics:
+					unique_words = count_unique_words(song_lyrics["lyrics"])
+					if year not in years_and_words:
+						years_and_words[year] = {
+							"words": 0,
+							"songs": 0
+						}
+					years_and_words[year]["words"] += len(unique_words)
+					years_and_words[year]["songs"] += 1
+	sorted_years = sorted(years_and_words.keys())
+	y_list = []
+	for year in sorted_years:
+		avg = years_and_words[year]['words'] / years_and_words[year]['songs']
+		print(f"In {year}, the Beatles used an average of {avg} different words per song (given the song has lyrics).")
+		y_list.append(avg)
+	xpoints = np.array(sorted_years)
+	ypoints = np.array(y_list)
+	plt.plot(xpoints, ypoints)
+	plt.title("Average Unique Words in Beatles Lyrics by Song Over Time")
 	plt.show()
+
+def songs_1963():
+	all_lyrics = utils.get_all_lyrics()
+	with open('beatles2.csv', 'r') as csvfile:
+		csvreader = csv.reader(csvfile)
+		next(csvreader)
+		for row in csvreader:
+			title = row[0]
+			song_lyrics = all_lyrics[title]
+			if "lyrics" in song_lyrics:
+				if row[1] == "1963":
+					unique_words = count_unique_words(song_lyrics["lyrics"])
+					print(f"{title} - {len(unique_words)} unique words")
+
+def unique_words_by_album():
+	all_lyrics = utils.get_all_lyrics()
+	albums = {
+		"Please Please Me": {},
+		"With the Beatles": {},
+		"A Hard Day's Night": {},
+		"Beatles for Sale": {},
+		"Help!": {},
+		"Rubber Soul": {},
+		"Revolver": {},
+		"Sgt. Pepper's Lonely Hearts Club Band": {},
+		"Magical Mystery Tour": {},
+		"The Beatles": {},
+		"Yellow Submarine": {},
+		"Abbey Road": {},
+		"Let It Be": {}
+	}
+	for album in albums:
+		albums[album] = {
+			"words": 0,
+			"songs": 0
+		}
+	with open('beatles2.csv', 'r') as csvfile:
+		csvreader = csv.reader(csvfile)
+		next(csvreader)
+		for row in csvreader:
+			for album in albums:
+				if "UK:" in row[2]:
+					if f"UK: {album}" in row[2]:
+						song_lyrics = all_lyrics[row[0]]
+						if "lyrics" in song_lyrics:
+							unique_words = count_unique_words(song_lyrics["lyrics"])
+							albums[album]["words"] += len(unique_words)
+						albums[album]["songs"] += 1
+				elif album == row[2]:
+					song_lyrics = all_lyrics[row[0]]
+					if "lyrics" in song_lyrics:
+						unique_words = count_unique_words(song_lyrics["lyrics"])
+						albums[album]["words"] += len(unique_words)
+					albums[album]["songs"] += 1
+	x_list = []
+	y_list = []
+	for album in albums:
+		avg = albums[album]["words"] / albums[album]["songs"]
+		print(f"The Beatles album {album} has an average of {avg} unique words.")
+		x_list.append(album)
+		y_list.append(avg)
+	xpoints = np.array(x_list)
+	ypoints = np.array(y_list)
+	plt.bar(xpoints, ypoints)
+	plt.title("Average Unique Words in Beatles Lyrics by Song Over Time")
+	plt.show()
+
 				
 
 if __name__ == '__main__':
 	clear()
-	avg_wc()
-	print("\n")
-	unique_words()
-	print("\n")
-	unique_songwriter()
-	print("\n")
-	unique_by_year()
-	print("\n")
-	avg_unique_by_year()
-		
+	# avg_wc()
+	# print("\n")
+	# unique_words()
+	# print("\n")
+	# unique_songwriter()
+	# print("\n")
+	# unique_by_year()
+	# print("\n")
+	# avg_unique_by_year()
+	# print("\n")
+	# avg_unique_by_song_by_year()
+	# print("\n")
+	unique_words_by_album()
