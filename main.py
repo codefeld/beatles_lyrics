@@ -120,9 +120,9 @@ def unique_by_year():
 		y_list.append(len(years_and_words[year]))
 	xpoints = np.array(sorted_years)
 	ypoints = np.array(y_list)
-	# plt.plot(xpoints, ypoints)
-	# plt.title("Number of Unique Words in Beatles Lyrics Over Time")
-	# plt.show()
+	plt.plot(xpoints, ypoints)
+	plt.title("Number of Unique Words in Beatles Lyrics Over Time")
+	plt.show()
 
 def avg_unique_by_year():
 	all_lyrics = utils.get_all_lyrics()
@@ -160,6 +160,7 @@ def avg_unique_by_year():
 	ypoints = np.array(y_list)
 	plt.plot(xpoints, ypoints)
 	plt.title("Average Unique Words in Beatles Lyrics Over Time")
+	plt.show()
 
 def avg_unique_by_song_by_year():
 	all_lyrics = utils.get_all_lyrics()
@@ -256,10 +257,161 @@ def unique_words_by_album():
 	xpoints = np.array(x_list)
 	ypoints = np.array(y_list)
 	plt.bar(xpoints, ypoints)
-	plt.title("Average Unique Words in Beatles Lyrics by Song Over Time")
+	plt.title("Average Unique Words in Beatles Lyrics by Song by Album")
 	plt.show()
 
-				
+# def unique_by_album():
+# 	all_lyrics = utils.get_all_lyrics()
+# 	albums = {
+# 		"Please Please Me": {},
+# 		"With the Beatles": {},
+# 		"A Hard Day's Night": {},
+# 		"Beatles for Sale": {},
+# 		"Help!": {},
+# 		"Rubber Soul": {},
+# 		"Revolver": {},
+# 		"Sgt. Pepper's Lonely Hearts Club Band": {},
+# 		"Magical Mystery Tour": {},
+# 		"The Beatles": {},
+# 		"Yellow Submarine": {},
+# 		"Abbey Road": {},
+# 		"Let It Be": {}
+# 	}
+# 	with open('beatles2.csv', 'r') as csvfile:
+# 		csvreader = csv.reader(csvfile)
+# 		next(csvreader)
+# 		for row in csvreader:
+# 			if "Lennon" in row[9] or "McCartney" in row[9] or "Harrison" in row[9] or "Starkey" in row[9]:
+# 				title = row[0]
+# 				album = row[2]
+# 				song_lyrics = all_lyrics[title]
+# 				if "lyrics" in song_lyrics:
+# 					unique_words = count_unique_words(song_lyrics["lyrics"])
+# 					if year not in albums:
+# 						albums[year] = []
+# 					all_unique_words = albums[year]
+# 					for word in unique_words:
+# 						if word not in all_unique_words:
+# 							all_unique_words.append(word)
+# 					albums[year] = all_unique_words
+# 	sorted_years = sorted(albums.keys())
+# 	y_list = []
+# 	for year in sorted_years:
+# 		print(f"In {year}, the Beatles used {len(albums[year])} different words.")
+# 		y_list.append(len(albums[year]))
+# 	xpoints = np.array(sorted_years)
+# 	ypoints = np.array(y_list)
+	# plt.plot(xpoints, ypoints)
+	# plt.title("Number of Unique Words in Beatles Lyrics Over Time")
+	# plt.show()	
+
+def all_unique_by_album():
+	all_lyrics = utils.get_all_lyrics()
+	albums = {
+		"Please Please Me": {},
+		"With the Beatles": {},
+		"A Hard Day's Night": {},
+		"Beatles for Sale": {},
+		"Help!": {},
+		"Rubber Soul": {},
+		"Revolver": {},
+		"Sgt. Pepper's Lonely Hearts Club Band": {},
+		"Magical Mystery Tour": {},
+		"The Beatles": {},
+		"Yellow Submarine": {},
+		"Abbey Road": {},
+		"Let It Be": {}
+	}
+	for album in albums:
+		albums[album] = {
+			"words": []
+		}
+	with open('beatles2.csv', 'r') as csvfile:
+		csvreader = csv.reader(csvfile)
+		next(csvreader)
+		for row in csvreader:
+			for album in albums:
+				if "UK:" in row[2]:
+					if f"UK: {album}" in row[2]:
+						song_lyrics = all_lyrics[row[0]]
+						if "lyrics" in song_lyrics:
+							unique_words = count_unique_words(song_lyrics["lyrics"])
+							for word in unique_words:
+								if word not in albums[album]["words"]:
+									albums[album]["words"].append(word)
+				elif album == row[2]:
+					song_lyrics = all_lyrics[row[0]]
+					if "lyrics" in song_lyrics:
+						unique_words = count_unique_words(song_lyrics["lyrics"])
+						for word in unique_words:
+							if word not in albums[album]["words"]:
+								albums[album]["words"].append(word)
+	x_list = []
+	y_list = []
+	for album in albums:
+		print(f"The Beatles album {album} has a total of {len(albums[album]['words'])} unique words.")
+		x_list.append(album)
+		y_list.append(len(albums[album]['words']))
+	xpoints = np.array(x_list)
+	ypoints = np.array(y_list)
+	plt.bar(xpoints, ypoints)
+	plt.title("Total Unique Words in Beatles Lyrics by Album")
+	plt.show()
+
+def most_words_per_sec():
+	all_lyrics = utils.get_all_lyrics()
+	most = 0
+	song_with_most = ""
+	with open('beatles2.csv', 'r') as csvfile:
+		csvreader = csv.reader(csvfile)
+		next(csvreader)
+		for row in csvreader:
+			title = row[0]
+			song_lyrics = all_lyrics[title]
+			if "lyrics" in song_lyrics:
+				if utils.words_per_sec(title, song_lyrics["lyrics"]) > most:
+					most = utils.words_per_sec(title, song_lyrics["lyrics"])
+					song_with_most = title
+	print(f"The Beatles song with the most words per second is \"{song_with_most}\", with {most} words per second.")
+
+def top_ten_words_per_sec():
+	all_lyrics = utils.get_all_lyrics()
+	song_with_value = []
+	with open('beatles2.csv', 'r') as csvfile:
+		csvreader = csv.reader(csvfile)
+		next(csvreader)
+		for row in csvreader:
+			title = row[0]
+			song_lyrics = all_lyrics[title]
+			if "lyrics" in song_lyrics:
+				value = utils.words_per_sec(title, song_lyrics["lyrics"])
+				song_with_value.append((value, title))
+	sorted_list_desc = sorted(song_with_value, key=lambda x: x[0], reverse=True)
+	print("The top 10 Beatles songs with the most words per second are:")
+	count = 1
+	for x in sorted_list_desc[:10]:
+		print(f"{count}: {x[1]}, with {x[0]} words per second")
+		count += 1
+
+def top_ten_beatles_words_per_sec():
+	all_lyrics = utils.get_all_lyrics()
+	song_with_value = []
+	with open('beatles2.csv', 'r') as csvfile:
+		csvreader = csv.reader(csvfile)
+		next(csvreader)
+		for row in csvreader:
+			if "Lennon" in row[9] or "McCartney" in row[9] or "Harrison" in row[9] or "Starkey" in row[9]:
+				title = row[0]
+				song_lyrics = all_lyrics[title]
+				if "lyrics" in song_lyrics:
+					value = utils.words_per_sec(title, song_lyrics["lyrics"])
+					song_with_value.append((value, title))
+	sorted_list_desc = sorted(song_with_value, key=lambda x: x[0], reverse=True)
+	print("The top 10 Beatles songs with the most words per second are:")
+	count = 1
+	for x in sorted_list_desc[:10]:
+		print(f"{count}: {x[1]}, with {x[0]} words per second")
+		count += 1
 
 if __name__ == '__main__':
 	clear()
@@ -275,4 +427,10 @@ if __name__ == '__main__':
 	# print("\n")
 	# avg_unique_by_song_by_year()
 	# print("\n")
-	unique_words_by_album()
+	# unique_words_by_album()
+	# print("\n")
+	# all_unique_by_album()
+	# print("\n")
+	# most_words_per_sec()
+	#top_ten_words_per_sec()
+	top_ten_beatles_words_per_sec()
