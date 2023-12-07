@@ -413,6 +413,48 @@ def top_ten_beatles_words_per_sec():
 		print(f"{count}: {x[1]}, with {x[0]} words per second")
 		count += 1
 
+def avg_word_count_by_chart():
+	all_lyrics = utils.get_all_lyrics()
+	words_and_ranks = {}
+	x = 1
+	while x != 51:
+		with open('beatles2.csv', 'r') as csvfile:
+			csvreader = csv.reader(csvfile)
+			next(csvreader)
+			songs = 0
+			all_words = 0
+			for row in csvreader:
+				title = row[0]
+				song_lyrics = all_lyrics[title]
+				if row[13] == "":
+					chart_num = 0
+				else:
+					chart_num = int(row[13])
+				if "lyrics" in song_lyrics:
+					cleaned_lyrics = utils.cleanse_lyrics(song_lyrics["lyrics"])
+					if chart_num == x:
+						# if chart_num not in words_and_ranks:
+						# 	words_and_ranks[chart_num] = 0
+						songs += 1
+						all_words += utils.count_words(cleaned_lyrics)
+			if songs == 0:
+				words_and_ranks[x] = 0
+			else:
+				words_and_ranks[x] = all_words / songs
+		x += 1
+	print(words_and_ranks)
+	x_list = []
+	y_list = []
+	for chart in words_and_ranks:
+		x_list.append(chart)
+		y_list.append(words_and_ranks[chart])
+	xpoints = np.array(x_list)
+	ypoints = np.array(y_list)
+	plt.bar(xpoints, ypoints)
+	plt.title("Average Word Count by Chart")
+	plt.show()
+
+
 if __name__ == '__main__':
 	clear()
 	# avg_wc()
@@ -432,5 +474,6 @@ if __name__ == '__main__':
 	# all_unique_by_album()
 	# print("\n")
 	# most_words_per_sec()
-	#top_ten_words_per_sec()
-	top_ten_beatles_words_per_sec()
+	# top_ten_words_per_sec()
+	# top_ten_beatles_words_per_sec()
+	avg_word_count_by_chart()
